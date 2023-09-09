@@ -10,5 +10,7 @@ void println(char *msg, ...);
 int Socket(int domain, int type, int protocol);
 int Bind(int fd, const struct sockaddr *addr, socklen_t len);
 
+char *Sock_ntop(const struct sockaddr *sa, socklen_t salen);
+
 /* Following shortens all the typecasts of pointer arguments: */
 #define SA struct sockaddr
