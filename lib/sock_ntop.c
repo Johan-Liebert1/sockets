@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <string.h>
 
-/* include sock_ntop */
+
 char *sock_ntop(const struct sockaddr *sa, socklen_t salen) {
     char portstr[8];
     static char str[128]; /* Unix domain is largest */

@@ -12,5 +12,11 @@ int Bind(int fd, const struct sockaddr *addr, socklen_t len);
 
 char *Sock_ntop(const struct sockaddr *sa, socklen_t salen);
 
+/* Read "n" bytes from a descriptor. */
+ssize_t Readn(int fd, void *ptr, size_t nbytes);
+
+/* Write "n" bytes to a descriptor. */
+void Writen(int fd, void *ptr, size_t nbytes);
+
 /* Following shortens all the typecasts of pointer arguments: */
 #define SA struct sockaddr
