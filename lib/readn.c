@@ -14,6 +14,8 @@ ssize_t readn(int fd, void *vptr, size_t n) {
     nleft = n;
 
     while (nleft > 0) {
+        println("in readn. nleft %d", nleft);
+
         if ((nread = read(fd, ptr, nleft)) < 0) {
             // Interrupted syscall
             if (errno == EINTR) {
@@ -28,6 +30,8 @@ ssize_t readn(int fd, void *vptr, size_t n) {
         nleft -= nread;
         ptr += nread;
     }
+
+    println("After while readn");
 
     return (n - nleft); /* return >= 0 */
 }

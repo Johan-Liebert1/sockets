@@ -4,7 +4,7 @@
 #include <string.h>
 #include <sys/socket.h>
 
-void err_quit(char *msg, ...)  {
+void err_quit(char *msg, ...) {
     va_list args;
     va_start(args, msg);
 
@@ -13,7 +13,7 @@ void err_quit(char *msg, ...)  {
     exit(EXIT_FAILURE);
 }
 
-void err_sys(char *msg)  {
+void err_sys(char *msg) {
     perror(msg);
     exit(EXIT_FAILURE);
 }
@@ -47,4 +47,3 @@ int Bind(int fd, const struct sockaddr *addr, socklen_t len) {
 
     return n;
 }
-

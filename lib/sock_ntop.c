@@ -1,11 +1,10 @@
 #include "headers.h"
 
 #include <arpa/inet.h>
-#include <sys/un.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
-
+#include <sys/un.h>
 
 char *sock_ntop(const struct sockaddr *sa, socklen_t salen) {
     char portstr[8];

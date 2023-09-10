@@ -1,9 +1,9 @@
 #include "../lib/headers.h"
-#include <netinet/in.h>
 #include <arpa/inet.h>
+#include <netinet/in.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
 #include <strings.h>
 #include <unistd.h>
 
@@ -22,7 +22,7 @@ int main(int argc, char **argv) {
     bzero(&servaddr, sizeof(servaddr));
 
     servaddr.sin_family = AF_INET;
-    servaddr.sin_port = htons(13); 
+    servaddr.sin_port = htons(13);
 
     int pton = inet_pton(AF_INET, argv[1], &servaddr.sin_addr);
 
@@ -35,7 +35,7 @@ int main(int argc, char **argv) {
     }
 
     if (connect(sockfd, (SA *)&servaddr, sizeof(servaddr)) < 0) {
-       err_sys("connect error");
+        err_sys("connect error");
     }
 
     while ((n = read(sockfd, recvline, MAXLINE)) > 0) {
