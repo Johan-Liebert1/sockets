@@ -3,23 +3,44 @@
 #include <netinet/in.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/param.h>
+#include <sys/select.h>
 #include <sys/socket.h>
 #include <unistd.h>
 
 void take_user_input(FILE *fp, int sockfd) {
     char sendline[1024], recvline[1024];
 
-    while (fgets(sendline, 1024, fp) != NULL) {
-        println("in take_user_input while %s", sendline);
+    fd_set rset;
+    int maxfdp1;
 
-        // strlen(sendline) - 1 => to not send \n
-        Writen(sockfd, sendline, strlen(sendline) - 1);
+    FD_ZERO(&rset);
 
-        if (read(sockfd, recvline, 1024) == 0) {
-            err_quit("take_user_input: server terminated prematurely");
+    while (1) {
+        FD_SET(sockfd, &rset);
+        FD_SET(fileno(fp), &rset);
+
+        maxfdp1 = MAX(sockfd, fileno(fp)) + 1;
+
+        if (select(maxfdp1, &rset, NULL, NULL, NULL) == -1) {
+            err_sys("select");
         }
 
-        printf("received: %s\n", recvline);
+        if (FD_ISSET(sockfd, &rset)) {
+            if (read(sockfd, recvline, 1024) == 0) {
+                err_quit("server terminated prematurely");
+            }
+
+            fputs(recvline, stdout);
+        }
+
+        if (FD_ISSET(fileno(fp), &rset)) {
+            if (fgets(sendline, 1024, stdin) == NULL) {
+                return;
+            }
+
+            write(sockfd, sendline, strlen(sendline));
+        }
     }
 }
 
