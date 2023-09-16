@@ -9,16 +9,21 @@
 #include <unistd.h>
 
 void take_user_input(FILE *fp, int sockfd) {
-    char sendline[1024], recvline[1024];
+    char buf[1024];
 
     fd_set rset;
     int maxfdp1;
+
+    int stdin_eof = 0;
 
     FD_ZERO(&rset);
 
     while (1) {
         FD_SET(sockfd, &rset);
-        FD_SET(fileno(fp), &rset);
+
+        if (stdin_eof == 0) {
+            FD_SET(fileno(fp), &rset);
+        }
 
         maxfdp1 = MAX(sockfd, fileno(fp)) + 1;
 
@@ -27,19 +32,37 @@ void take_user_input(FILE *fp, int sockfd) {
         }
 
         if (FD_ISSET(sockfd, &rset)) {
-            if (read(sockfd, recvline, 1024) == 0) {
+            if (read(sockfd, buf, 1024) == 0) {
+                if (stdin_eof == 1) {
+                    return; // normal termination
+                }
+
                 err_quit("server terminated prematurely");
             }
 
-            fputs(recvline, stdout);
+            // NOTE: Not using stdio functions as they operate on lines instead of on buffers
+            // fputs(recvline, stdout);
+            write(stdout, buf, sizeof(buf));
         }
 
         if (FD_ISSET(fileno(fp), &rset)) {
-            if (fgets(sendline, 1024, stdin) == NULL) {
-                return;
+            // NOTE: Not using stdio functions as they operate on lines instead of on buffers
+            // if (fgets(sendline, 1024, stdin) == NULL) {
+            //     return;
+            // }
+
+            if (read(fileno(fp), buf, 1024) == 0) {
+                stdin_eof = 1;
+
+                // send FIN to server, but don't close the socket read end yet
+                // as the server might have data to send to us
+                shutdown(sockfd, SHUT_WR);
+
+                FD_CLR(fileno(fp), &rset);
+                continue;
             }
 
-            write(sockfd, sendline, strlen(sendline));
+            write(sockfd, buf, strlen(buf));
         }
     }
 }
