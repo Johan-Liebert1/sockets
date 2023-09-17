@@ -1,7 +1,8 @@
 #include <sys/socket.h>
 
 #define MAXLINE 1024
-#define LISTENQ 1024
+#define LISTENQ 10
+#define LOCALHOST "127.0.0.1"
 
 void err_quit(char *msg, ...);
 void err_sys(char *msg, ...);
