@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/socket.h>
+#include <unistd.h>
 
 void dg_cli(int sockfd, struct sockaddr *server_addr,
             socklen_t server_addr_len) {
@@ -11,15 +12,21 @@ void dg_cli(int sockfd, struct sockaddr *server_addr,
     char send_line[MAXLINE];
     char recv_line[MAXLINE];
 
+    // this makes it so that the current UDP socket can only connect to the
+    // peer whose address we've passed in to server_addr
+    // any messages from other peers to this socket will be discarded
+    if (connect(sockfd, server_addr, server_addr_len) == -1) {
+        err_sys("connect");
+    }
+
     while (fgets(send_line, MAXLINE, stdin) != NULL) {
-        int n =
-            sendto(sockfd, send_line, strlen(send_line), 0, server_addr, server_addr_len);
+        int n = write(sockfd, send_line, strlen(send_line));
 
         if (n < 0) {
             err_sys("sendto");
         }
 
-        n = recvfrom(sockfd, recv_line, MAXLINE, 0, server_addr, &server_addr_len);
+        n = read(sockfd, recv_line, MAXLINE);
 
         if (n < 0) {
             err_sys("recvfrom");
