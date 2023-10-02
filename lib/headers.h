@@ -1,8 +1,11 @@
+#include <fcntl.h>
 #include <sys/socket.h>
 
 #define MAXLINE 1024
 #define LISTENQ 10
 #define LOCALHOST "127.0.0.1"
+
+#define FILE_MODE (S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)
 
 void err_quit(char *msg, ...);
 void err_sys(char *msg, ...);
